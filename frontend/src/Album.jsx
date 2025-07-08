@@ -9,18 +9,51 @@ const Album = ({ album, getAlbums, inputs, setInputs }) => {
   ? when the response is ok, alert the user & call the function getAlbums() to update the page
   ? change setIsEditing to false
    */
-  async function handleUpdate() {
-    
+async function handleUpdate() {
+  const formData = new FormData();
+  formData.append("jacket", inputs.jacket);
+
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API}/update/${album._id}`, {
+      method: "PATCH",
+      body: formData,
+    });
+
+    if (!res.ok) throw new Error("Failed to update image");
+
+    const updatedAlbum = await res.json();
+    alert("Image updated successfully!");
+    getAlbums();
+    setIsEditing(false);
+  } catch (err) {
+    console.error(err);
+    alert("Update failed.");
   }
+}
+
 
   /* 
   ? make a fetch call to "API/delete/:id"
   ? when the response is ok, alert the user & call the function getAlbums() to update the page
   ? 
   */
-  async function handleDelete() {
-   
+async function handleDelete() {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API}/delete/${album._id}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) throw new Error("Failed to delete album");
+
+    alert("Album deleted successfully!");
+    getAlbums();
+  } catch (err) {
+    console.error(err);
+    alert("Delete failed.");
   }
+}
+
+
 
   return (
     <div className="card">

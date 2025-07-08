@@ -36,6 +36,34 @@ function App() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append("artist", inputs.artist);
+    formData.append("title", inputs.title);
+    formData.append("year", inputs.year);
+    // uploading a jacket is optional
+    if (inputs.jacket) {
+      formData.append("jacket", inputs.jacket);
+    }
+
+    setInputs({});
+    fileInput.current.value = "";
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API}/add`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setAlbum(data);
+        alert("added!");
+      } else throw new Error(data.error.message);
+    } catch (error) {
+      console.error(error);
+      alert(error.message);
+    }
   }
 
   return (
