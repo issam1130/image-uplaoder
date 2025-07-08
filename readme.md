@@ -46,3 +46,5 @@
         - update the jacket according to the `req.file`'s file name
         - send a response with the updated object
     - Frontend: update the function `handleUpdate()` in `Album.jsx`
+
+### We will be deploying the app tomorrow. Please create a new repo on your github account and link this repo to it! 

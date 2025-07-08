@@ -9,51 +9,55 @@ const Album = ({ album, getAlbums, inputs, setInputs }) => {
   ? when the response is ok, alert the user & call the function getAlbums() to update the page
   ? change setIsEditing to false
    */
-async function handleUpdate() {
-  const formData = new FormData();
-  formData.append("jacket", inputs.jacket);
 
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API}/update/${album._id}`, {
-      method: "PATCH",
-      body: formData,
-    });
+  async function handleUpdate() {
+    try {
+      const formData = new FormData();
+      formData.append("jacket", inputs.jacket);
 
-    if (!res.ok) throw new Error("Failed to update image");
+      const response = await fetch(
+        `${import.meta.env.VITE_API}/update/${album._id}`,
+        {
+          method: "PATCH",
+          body: formData,
+        }
+      );
 
-    const updatedAlbum = await res.json();
-    alert("Image updated successfully!");
-    getAlbums();
-    setIsEditing(false);
-  } catch (err) {
-    console.error(err);
-    alert("Update failed.");
+      if (response.ok) {
+        alert("updated!");
+        getAlbums();
+        setIsEditing(!isEditing);
+      } else {
+        throw new Error("please try again with a valid file");
+      }
+    } catch (error) {
+      console.error(error);
+      alert(error.message);
+    }
   }
-}
-
 
   /* 
   ? make a fetch call to "API/delete/:id"
   ? when the response is ok, alert the user & call the function getAlbums() to update the page
-  ? 
   */
-async function handleDelete() {
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API}/delete/${album._id}`, {
-      method: "DELETE",
-    });
 
-    if (!res.ok) throw new Error("Failed to delete album");
+  async function handleDelete() {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API}/delete/${album._id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
-    alert("Album deleted successfully!");
-    getAlbums();
-  } catch (err) {
-    console.error(err);
-    alert("Delete failed.");
+      if (response.ok) {
+        alert("deleted!");
+        getAlbums();
+      }
+    } catch (error) {
+      alert(error.message);
+    }
   }
-}
-
-
 
   return (
     <div className="card">

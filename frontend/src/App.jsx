@@ -59,7 +59,7 @@ function App() {
       if (response.ok) {
         setAlbum(data);
         alert("added!");
-      } else throw new Error(data.error.message);
+      } else throw new Error(data.error);
     } catch (error) {
       console.error(error);
       alert(error.message);
