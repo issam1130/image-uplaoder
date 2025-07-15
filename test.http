@@ -1,0 +1,39 @@
+POST http://localhost:3001/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "testpass"
+}
+
+### Login
+POST http://localhost:3001/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "testpass"
+}
+
+
+### Get Current User
+GET http://localhost:3001/me
+Cookie: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NzU3MTE4YTUyYWM1MDI3ZTA1MjA2MSIsInVzZXJuYW1lIjoidGVzdHVzZXIiLCJpYXQiOjE3NTI1MjcxMzksImV4cCI6MTc1MzEzMTkzOX0._vfunYOcqRSE2XDP3xQOf-ma2_aXRBHssj8PDiCQOZI; Max-Age=604800; Path=/; Expires=Mon, 21 Jul 2025 21:05:39 GMT; HttpOnly; SameSite=Lax
+
+### Create a post (without image)
+POST http://localhost:3001/add
+Content-Type: application/json
+
+{
+  "username": "test",
+  "caption": "a post!"
+}
+
+### Update post by ID
+PUT http://localhost:3001/update/abcd1234
+Content-Type: application/json
+
+{
+  "username": "johnny",
+  "caption": "Updated caption from backend!"
+}

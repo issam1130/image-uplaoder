@@ -1,116 +1,83 @@
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+
 import "./App.css";
-import { useState, useEffect, useRef } from "react";
-import Album from "./Album";
+import PostCard from "./components/PostCard";
+import PostForm from "./components/PostForm";
+import Register from "./components/Register";
+import Login from "./components/Login";
+import { useAuth } from "./components/AuthContext";
+
+function Home({ posts, getPosts }) {
+  return (
+    <>
+      <h1>Recent Posts</h1>
+      {!!posts.length &&
+        posts.map((post) => (
+          <PostCard key={post._id} post={post} getPosts={getPosts} />
+        ))}
+    </>
+  );
+}
 
 function App() {
-  const [inputs, setInputs] = useState({});
-  const [albums, setAlbums] = useState([]);
-  const [album, setAlbum] = useState([]);
-
-  const fileInput = useRef(null); // 1. this will hold a reference to our file input!
+  const [posts, setPosts] = useState([]);
+  const [newPost, setNewPost] = useState([]);
+  const { user, logout } = useAuth();
 
   useEffect(() => {
-    getAlbums();
-  }, [album]);
+    getPosts();
+  }, [newPost]);
 
-  async function getAlbums() {
-    const response = await fetch(`${import.meta.env.VITE_API}/albums`);
+  async function getPosts() {
+    const response = await fetch(`${import.meta.env.VITE_API}/posts`);
     if (response.ok) {
       const data = await response.json();
-      setAlbums(data);
-    }
-  }
-
-  function handleChange(e) {
-    setInputs((prev) => {
-      return { ...prev, [e.target.name]: e.target.value };
-    });
-  }
-
-  /* 
-  ? upon submitting the form, 
-  ? make a fetch call to "...API/add" 
-  ? send the formData including the file 
-  ? get the response and setAlbum() accordingly
-   */
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append("artist", inputs.artist);
-    formData.append("title", inputs.title);
-    formData.append("year", inputs.year);
-    // uploading a jacket is optional
-    if (inputs.jacket) {
-      formData.append("jacket", inputs.jacket);
-    }
-
-    setInputs({});
-    fileInput.current.value = "";
-
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API}/add`, {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setAlbum(data);
-        alert("added!");
-      } else throw new Error(data.error);
-    } catch (error) {
-      console.error(error);
-      alert(error.message);
+      setPosts(data);
     }
   }
 
   return (
-    <>
-      <h1>My Favorites</h1>
-      <form onSubmit={handleSubmit} className="form">
-        <input
-          type="text"
-          placeholder="artist"
-          onChange={handleChange}
-          value={inputs.artist || ""}
-          name="artist"
-        />
-        <input
-          type="text"
-          placeholder="title"
-          onChange={handleChange}
-          value={inputs.title || ""}
-          name="title"
-        />
-        <input
-          type="text"
-          placeholder="year"
-          onChange={handleChange}
-          value={inputs.year || ""}
-          name="year"
-        />
-        <input
-          type="file"
-          ref={fileInput} // 2. this sets the reference to file input
-          onChange={(e) => setInputs({ ...inputs, jacket: e.target.files[0] })}
-          accept="image/*"
-        />
-        <button>Add</button>
-      </form>
+    <Router>
+      <header>
+        <nav className="navbar">
+          <ul>
+            <li><Link to="/">Home</Link></li>
+            {user && <li><Link to="/post">Create Post</Link></li>}
+            {!user && (
+              <>
+                <li><Link to="/login">Login</Link></li>
+                <li><Link to="/register">Register</Link></li>
+              </>
+            )}
+            {user && (
+              <>
+                  {/* <li>Welcome, {user.username}</li> */} 
+                <li><button onClick={logout}>Logout</button></li>
+              </>
+            )}
+          </ul>
+        </nav>
+      </header>
 
-      {!!albums.length &&
-        albums.map((album) => (
-          <Album
-            key={album._id}
-            album={album}
-            getAlbums={getAlbums}
-            inputs={inputs}
-            setInputs={setInputs}
+      <main>
+        <Routes>
+          <Route path="/" element={<Home posts={posts} getPosts={getPosts} />} />
+          <Route
+            path="/post"
+            element={user ? <PostForm setNewPost={setNewPost} /> : <Navigate to="/login" />}
           />
-        ))}
-    </>
+          <Route
+            path="/login"
+            element={!user ? <Login /> : <Navigate to="/post" />}
+          />
+          <Route
+            path="/register"
+            element={!user ? <Register /> : <Navigate to="/post" />}
+          />
+        </Routes>
+      </main>
+    </Router>
   );
 }
 
